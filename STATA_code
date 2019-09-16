@@ -1,0 +1,143 @@
+
+STATA code
+
+
+*Some cleanup
+
+replace ethnicity_code="5" if ethnicity_code=="Any other ethnic group (S)" replace ethnicity_code="5" if ethnicity_code=="Other"
+replace ethnicity_code="9" if ethnicity_code=="Not Stated/Null"
+destring ethnicity_code, replace
+replace IMD_National_quintile1="0" if IMD_National_quintile1=="NULL" destring IMD_National_quintile1, replace
+replace IMD_national_decile2 ="0" if IMD_national_decile2 =="NULL" destring IMD_national_decile2, replace
+generate borough_code = borough
+label variable borough_code "borough_code"
+replace borough_code="1" if borough_code=="Channel Islands" replace borough_code="2" if borough_code=="Croydon"
+replace borough_code="3" if borough_code=="Lambeth"
+replace borough_code="4" if borough_code=="Lewisham" replace borough_code="5" if borough_code=="Southwark" replace borough_code = "6" if borough_code=="Other - England " replace borough_code="7" if borough_code=="Other - Wales" replace borough_code = "0" if borough_code=="NULL"
+replace borough_code = "0" if borough_code==""
+destring borough_code, replace
+
+*borough_code has all characters numeric; replaced as byte
+
+replace IMD_2010_adjusted = "0" if IMD_2010_adjusted=="NULL" destring IMD_2010_adjusted, replace
+
+*IMD_2010_adjusted has all characters numeric; replaced as double replace Total="98" if Total=="NULL"
+
+replace Adjusted_Total ="98" if Adjusted_Total =="NULL" destring Total, replace
+
+*Total has all characters numeric; replaced as byte
+
+destring Adjusted_Total, replace
+
+*Adjusted_Total has all characters numeric; replaced as double
+
+replace Agitated_Behaviour_Score_ID="9" if Agitated_Behaviour_Score_ID=="NULL"
+replace Agitated_Behaviour_Score_ID="9" if Agitated_Behaviour_Score_ID=="."
+destring Agitated_Behaviour_Score_ID, replace
+
+*Agitated_Behaviour_Score_ID has all characters numeric; replaced as byte
+
+replace Self_Injury_Score_ID ="9" if Self_Injury_Score_ID =="NULL"
+replace Self_Injury_Score_ID ="9" if Self_Injury_Score_ID =="."
+destring Self_Injury_Score_ID , replace
+
+*Self_Injury_Score_ID has all characters numeric; replaced as byte
+
+replace Problem_Drinking_Drugs_Score_ID ="9" if Problem_Drinking_Drugs_Score_ID =="NULL"
+replace Problem_Drinking_Drugs_Score_ID ="9" if Problem_Drinking_Drugs_Score_ID =="."
+destring Problem_Drinking_Drugs_Score_ID , replace *Problem_Drinking_Drugs_Score_ID has all characters numeric; replaced as byte
+replace Cognitive_Problems_Score_ID ="9" if Cognitive_Problems_Score_ID =="NULL" replace Cognitive_Problems_Score_ID ="9" if Cognitive_Problems_Score_ID =="." destring Cognitive_Problems_Score_ID , replace
+
+*Cognitive_Problems_Score_ID has all characters numeric; replaced as byte
+
+replace Physical_Illness_Score_ID ="9" if Physical_Illness_Score_ID =="NULL"
+replace Physical_Illness_Score_ID ="9" if Physical_Illness_Score_ID =="."
+
+destring Physical_Illness_Score_ID , replace
+
+*Physical_Illness_Score_ID has all characters numeric; replaced as byte
+
+replace Hallucinations_Score_ID ="9" if Hallucinations_Score_ID =="NULL"
+replace Hallucinations_Score_ID ="9" if Hallucinations_Score_ID =="."
+destring Hallucinations_Score_ID , replace
+
+*Hallucinations_Score_ID has all characters numeric; replaced as byte
+
+replace Depressed_Mood_Score_ID ="9" if Depressed_Mood_Score_ID =="NULL"
+replace Depressed_Mood_Score_ID ="9" if Depressed_Mood_Score_ID =="."
+destring Depressed_Mood_Score_ID , replace
+
+*Depressed_Mood_Score_ID has all characters numeric; replaced as byte
+
+replace Other_Mental_Problems_Score_ID ="9" if Other_Mental_Problems_Score_ID =="NULL"
+replace Other_Mental_Problems_Score_ID ="9" if Other_Mental_Problems_Score_ID =="."
+destring Other_Mental_Problems_Score_ID , replace *Other_Mental_Problems_Score_ID has all characters numeric; replaced as byte
+replace Relationship_Problems_Score_ID ="9" if Relationship_Problems_Score_ID =="NULL"
+replace Relationship_Problems_Score_ID ="9" if Relationship_Problems_Score_ID =="."
+destring Relationship_Problems_Score_ID , replace *Relationship_Problems_Score_ID has all characters numeric; replaced as byte
+replace Daily_Living_Problems_Score_ID ="9" if Daily_Living_Problems_Score_ID =="NULL"
+replace Daily_Living_Problems_Score_ID="9" if Daily_Living_Problems_Score_ID =="."
+destring Daily_Living_Problems_Score_ID , replace *Daily_Living_Problems_Score_ID has all characters numeric; replaced as byte
+replace Living_Conditions_Problems_Score ="9" if Living_Conditions_Problems_Score =="NULL"
+replace Living_Conditions_Problems_Score ="9" if Living_Conditions_Problems_Score =="."
+
+destring Living_Conditions_Problems_Score , replace *Living_Conditions_Problems_Score has all characters numeric; replaced as byte
+replace Occupational_Problems_Score_ID ="9" if Occupational_Problems_Score_ID =="NULL"
+replace Occupational_Problems_Score_ID ="9" if Occupational_Problems_Score_ID =="."
+destring Occupational_Problems_Score_ID , replace *Occupational_Problems_Score_ID has all characters numeric; replaced as byte
+recode ethnicity_code 9=.
+replace borough = "NULL" if borough == "" recode borough_code 0=.
+
+*change order
+
+order brcid_encrypted index_date cleaneddateofbirth age_at_index_date age_group Gender_ID gender_code ethnicitycleaned ethnicity_group ethnicity_code Date_Of_Death age_at_death LSOA11 borough borough_code address_detail IMD_2010_adjusted IMD_National_quintile1 IMD_national_decile2 inpatient_days_pre_index_window inpatient_days_post_index total_inpatient_days N_f2f_team_inpatient_combined_6m N_f2f_team_inpatient_combined_pr N_f2f_team_inpatient_combined_to N_f2f_team_only_pre_index_window N_f2f_team_only_post_index_windo N_f2f_team_only_total first_f2f_team_ward_event last_f2f_team_ward_event duration_bw_first_last_ward_year Schizophrenia_F20 Schizoaffective_F25 Bipolar_F31 Depressive_RecurrentDepressive_F smi closest_honos_rating_date Agitated_Behaviour_Score_ID Self_Injury_Score_ID Problem_Drinking_Drugs_Score_ID Cognitive_Problems_Score_ID Physical_Illness_Score_ID Hallucinations_Score_ID Depressed_Mood_Score_ID Other_Mental_Problems_Type_ID Other_Mental_Problems_Score_ID Relationship_Problems_Score_ID Daily_Living_Problems_Score_ID Living_Conditions_Problems_Score Occupational_Problems_Score_ID Total Adjusted_Total antipsych_pre_index antipsych_10 antipsych_11 antipsych_12 antipsych_13 antipsych_14 antipsych_15 antipsych_16 antipsych_17 years_on_antipsych_post_index antidepressant_pre_index antidepressant_10 antidepressant_11 antidepressant_12 antidepressant_13 antidepressant_14 antidepressant_15 antidepressant_16 antidepressant_17 years_on_antidepressant_post_ind hypnotic_pre_index hypnotic_10 hypnotic_11 hypnotic_12 hypnotic_13 hypnotic_14 hypnotic_15 hypnotic_16 hypnotic_17 years_on_hypnotic_post_index anticholinergics_pre_index anticholinergics_10
+anticholinergics_11 anticholinergics_12 anticholinergics_13 anticholinergics_14 anticholinergics_15 anticholinergics_16 anticholinergics_17 years_on_antichol_post_index antipsychotic_yes_no antidepressant_yes_no hypnotic_yes_no anticholiner_yes_no smoking smoking_at_index smoking_at_index_date current_smoking_closest_to_index diabetic diabetes_ap diabetes_meds BMI_score BMI_meaning BMI_Date N_FCEs_2010 N_FCEs_2011 N_FCEs_2012 N_FCEs_2013 N_FCEs_2014 N_FCEs_2015 N_FCEs_2016 N_FCEs_2017 total_FCE_post_index dental_event dental_event_sum merge_dental_Event c2
+
+*some recoding
+
+recode Agitated_Behaviour_Score_ID 9=. recode Self_Injury_Score_ID 9=.
+recode Problem_Drinking_Drugs_Score_ID 9=. recode Cognitive_Problems_Score_ID 9=. recode Physical_Illness_Score_ID 9=.
+recode Hallucinations_Score_ID 9=.
+recode Depressed_Mood_Score_ID 9=.
+recode Other_Mental_Problems_Score_ID 9=. recode Relationship_Problems_Score_ID 9=. recode Daily_Living_Problems_Score_ID 9=. recode Living_Conditions_Problems_Score 9=. recode Occupational_Problems_Score_ID 9=. recode smoking 9=.
+
+*Descriptive stats
+
+tab gender_code dental_event, row chi2
+tab ethnicity_code dental_event, row chi2
+tab Problem_Drinking_Drugs_Score_ID dental_event, row chi2 tab Physical_Illness_Score_ID dental_event, row chi2
+tab smoking dental_event, row chi2
+tab diabetic dental_event, row chi2
+tab antidepressant_yes_no dental_event, row chi2
+
+tab antipsychotic_yes_no dental_event, row chi2 tab Schizophrenia_F20 dental_event, row chi2 tab Schizoaffective_F25 dental_event, row chi2 tab Bipolar_F31 dental_event, row chi2
+tab Depressive_RecurrentDepressive_F dental_event, row chi2 summarize age_at_index_date
+summarize IMD_national_decile2
+
+*Logistic Regression *1. covariates only
+
+logistic dental_event age_per_10_yr gender_code i.ethnicity_code IMD_national_decile2 Problem_Drinking_Drugs_Score_ID Physical_Illness_Score_ID smoking diabetic, baselevels
+
+*2. covariates plus med
+
+logistic dental_event age_per_10_yr gender_code i.ethnicity_code IMD_national_decile2 Problem_Drinking_Drugs_Score_ID Physical_Illness_Score_ID smoking diabetic antidepressant_yes_no antipsychotic_yes_no, baselevels
+
+*3. covariates plus smi
+
+logistic dental_event age_per_10_yr gender_code i.ethnicity_code IMD_national_decile2 Problem_Drinking_Drugs_Score_ID Physical_Illness_Score_ID smoking diabetic Schizophrenia_F20 Schizoaffective_F25 Bipolar_F31 Depressive_RecurrentDepressive_F, baselevels
+
+* model with covariates plus depressive diagnosis and antidepressant med - effect on odds
+
+logistic dental_event age_per_10_yr gender_code i.ethnicity_code IMD_national_decile2 Problem_Drinking_Drugs_Score_ID Physical_Illness_Score_ID smoking diabetic Depressive_RecurrentDepressive_F antidepressant_yes_no , baselevels
+
+*end date
+
+generate enddate= 31/07/2017
+format enddate %td
+format enddate %tdnn/dd/CCYY
+replace enddate=mdy(3,31,2017)
+generate duration = enddate- index_date
+replace duration =( Date_Of_Death - index_date) if Date_Of_Death!=. label variable duration "duration days from index"
+label variable enddate "31/03/2017"
+generate durationyr = duration/365
+label variable durationyr "duration years from index"
