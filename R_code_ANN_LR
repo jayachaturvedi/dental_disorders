@@ -1,0 +1,309 @@
+##Author: Jaya Chaturvedi##
+##R code for Artificial Neural Network and Logistic Regression predictions##
+
+library (haven)
+
+v2cohort_file_with_dental_event_regression_wide_R <-read_dta("T:/Jaya Chaturvedi/1. Dental_Disorders_SMI/v2cohort_file_with_dental_event_regression_wide_R - Copy-slightlyunequalbalanced.dta")
+
+View(v2cohort_file_with_dental_event_regression_wide_R)
+
+mydatawide <- v2cohort_file_with_dental_event_regression_wide_R
+
+mydatawide$ethnicity_code[mydatawide$ethnicity_code == 9] <- NA
+
+mydatawide$borough_code[mydatawide$borough_code == 0] <- NA
+
+mydatawide$IMD_National_quintile1[mydatawide$IMD_National_quintile1 == 0] <-   NA
+
+mydatawide$IMD_national_decile2[mydatawide$IMD_national_decil e2==0]<- NA
+
+mydatawide$Agitated_Behaviour_Score_ID[mydatawide$Agitated_Behaviour_Score_ID ==9] <- NA
+
+mydatawide$Self_Injury_Score_ID[mydatawide$Self_Injury_Score_ ID==9]<- NA
+
+mydatawide$Problem_Drinking_Drugs_Score_ID[mydatawide$Problem_Drinking_Drugs_Score_ID == 9] <- NA
+
+mydatawide$Cognitive_Problems_Score_ID[mydatawide$Cognitive_Problems_Score_ID ==9] <- NA
+
+mydatawide$Physical_Illness_Score_ID[mydatawide$Physical_Illness_Score_ID ==9] <- NA
+
+mydatawide$Hallucinations_Score_ID[mydatawide$Hallucinations_Score_ID == 9] <- NA
+
+mydatawide$Depressed_Mood_Score_ID[mydatawide$Depressed_Mood_Score_ID == 9] <- NA
+
+mydatawide$Other_Mental_Problems_Score_ID[mydatawide$Other_Mental_Problems_Score_ID == 9] <- NA
+
+mydatawide$Relationship_Problems_Score_ID[mydatawide$Relation
+ship_Problems_Score_ID == 9] <- NA
+mydatawide$Daily_Living_Problems_Score_ID[mydatawide$Daily_Li
+ving_Problems_Score_ID == 9] <- NA
+mydatawide$Living_Conditions_Problems_Score[mydatawide$Living
+_Conditions_Problems_Score ==  9] <- NA
+mydatawide$Occupational_Problems_Score_ID[mydatawide$Occupati
+onal_Problems_Score_ID == 9] <- NA
+mydatawide$Adjusted_Total[mydatawide$Adjusted_Total == 99] <-
+NA
+
+library(scales)
+
+mydatawide$scaledage <-
+rescale(mydatawide$age_at_index_date, to = c(0, 1), from =
+range(mydatawide$age_at_index_date, na.rm = TRUE, finite =
+TRUE ) )
+mydatawide$age_at_index_date = NULL
+mydatawide$z_IMD_2010_adjusted <-
+rescale(mydatawide$IMD_2010_adjusted, to = c(0, 1), from =
+range(mydatawide$IMD_2010_adjusted, na.rm = TRUE, finite =
+TRUE ) )
+mydatawide$IMD_2010_adjusted = NULL
+mydatawide$z_IMD_National_quintile1 <- rescale(
+mydatawide$IMD_National_quintile1,    to = c(0, 1), from =
+range(mydatawide$IMD_National_quintile1, na.rm = TRUE, finite
+= TRUE ) )
+mydatawide$IMD_National_quintile1 = NULL
+mydatawide$z_IMD_national_decile2 <-
+rescale(mydatawide$IMD_national_decile2, to = c(0, 1), from =
+range(mydatawide$IMD_national_decile2, na.rm = TRUE, finite =
+TRUE ) )
+mydatawide$IMD_national_decile2 = NULL
+mydatawide$z_IMD_national_decile2[mydatawide$z_IMD_national_d
+ecile2 == 0] <- NA
+
+
+mydatawide$z_total_inpatient_days <-
+rescale(mydatawide$total_inpatient_days, to = c(0, 1), from =
+range( mydatawide$total_inpatient_days, na.rm = TRUE, finite
+= TRUE ) )
+mydatawide$total_inpatient_days = NULL
+mydatawide$z_N_f2f_team_inpatient_combined_pr <-  rescale(
+mydatawide$N_f2f_team_inpatient_combined_pr,  to = c(0, 1),
+from = range(
+mydatawide$N_f2f_team_inpatient_combined_pr,  na.rm = TRUE,
+finite = TRUE  ) )
+mydatawide$N_f2f_team_inpatient_combined_pr = NULL
+mydatawide$z_N_f2f_team_only_total <- rescale(
+mydatawide$N_f2f_team_only_total, to = c(0, 1), from =
+range(mydatawide$N_f2f_team_only_total,  na.rm = TRUE, finite
+= TRUE) )
+mydatawide$N_f2f_team_only_total = NULL
+mydatawide$z_duration_bw_first_last_ward_year <- rescale(
+mydatawide$duration_bw_first_last_ward_year, to = c(0, 1),
+from = range(
+mydatawide$duration_bw_first_last_ward_year,  na.rm = TRUE,
+finite = TRUE ) )
+mydatawide$duration_bw_first_last_ward_year = NULL
+mydatawide$z_total_FCE_post_index <-
+rescale(mydatawide$total_FCE_post_index, to = c(0, 1), from =
+range( mydatawide$total_FCE_post_index, na.rm = TRUE,finite =
+TRUE) )
+mydatawide$total_FCE_post_index = NULL
+mydatawide$z_Self_Injury_Score_ID <- rescale(
+mydatawide$Self_Injury_Score_ID, to = c(0, 1), from =
+range(mydatawide$Self_Injury_Score_ID, na.rm = TRUE,finite =
+TRUE )  )
+mydatawide$z_Problem_Drinking_Drugs_Score_ID <- rescale(
+mydatawide$Problem_Drinking_Drugs_Score_ID, to = c(0, 1),
+from = range(
+mydatawide$Problem_Drinking_Drugs_Score_ID, na.rm = TRUE,
+finite = TRUE ) )
+
+mydatawide$z_Cognitive_Problems_Score_ID <- rescale(
+mydatawide$Cognitive_Problems_Score_ID, to = c(0, 1), from =
+range(      mydatawide$Cognitive_Problems_Score_ID,  na.rm =
+TRUE, finite = TRUE  ) )
+mydatawide$z_Physical_Illness_Score_ID <-  rescale(
+mydatawide$Physical_Illness_Score_ID, to = c(0, 1), from =
+range(     mydatawide$Physical_Illness_Score_ID, na.rm =
+TRUE, finite = TRUE  ) )
+mydatawide$z_Hallucinations_Score_ID <- rescale(
+mydatawide$Hallucinations_Score_ID,    to = c(0, 1), from =
+range( mydatawide$Hallucinations_Score_ID,  na.rm = TRUE,
+finite = TRUE ) )
+mydatawide$z_Depressed_Mood_Score_ID <- rescale(
+mydatawide$Depressed_Mood_Score_ID, to = c(0, 1), from =
+range(     mydatawide$Depressed_Mood_Score_ID,   na.rm =
+TRUE, finite = TRUE  ) )
+mydatawide$z_Other_Mental_Problems_Score_ID <- rescale(
+mydatawide$Other_Mental_Problems_Score_ID,  to = c(0, 1),
+from = range(      mydatawide$Other_Mental_Problems_Score_ID,
+na.rm = TRUE, finite = TRUE  ) )
+mydatawide$z_Relationship_Problems_Score_ID <- rescale(
+mydatawide$Relationship_Problems_Score_ID, to = c(0, 1), from
+= range(      mydatawide$Relationship_Problems_Score_ID,
+na.rm = TRUE, finite = TRUE  ) )
+mydatawide$z_Daily_Living_Problems_Score_ID <- rescale(
+mydatawide$Daily_Living_Problems_Score_ID, to = c(0, 1), from
+= range(      mydatawide$Daily_Living_Problems_Score_ID,
+na.rm = TRUE, finite = TRUE ) )
+mydatawide$z_Living_Conditions_Problems_Score <- rescale(
+mydatawide$Living_Conditions_Problems_Score, to = c(0, 1),
+from = range(
+mydatawide$Living_Conditions_Problems_Score, na.rm = TRUE,
+finite = TRUE  ) )
+mydatawide$z_Occupational_Problems_Score_ID <- rescale(
+mydatawide$Occupational_Problems_Score_ID,  to = c(0, 1),
+from = range(      mydatawide$Occupational_Problems_Score_ID,
+na.rm = TRUE, finite = TRUE  ) )
+mydatawide$z_Adjusted_Total <-
+rescale(mydatawide$Adjusted_Total, to = c(0, 1),    from =
+range(mydatawide$Adjusted_Total, na.rm = TRUE, finite = TRUE ))
+mydatawide$z_BMI_score <- rescale(mydatawide$BMI_score, to =
+c(0, 1), from = range(mydatawide$BMI_score, na.rm = TRUE,
+finite = TRUE)  )
+mydatawide$z_smi <- rescale(mydatawide$smi, to = c(0, 1),
+from = range(mydatawide$smi, na.rm = TRUE, finite = TRUE)  )
+
+mydatawide$Self_Injury_Score_ID = NULL
+mydatawide$Problem_Drinking_Drugs_Score_ID = NULL
+mydatawide$Cognitive_Problems_Score_ID = NULL
+mydatawide$Physical_Illness_Score_ID = NULL
+mydatawide$Hallucinations_Score_ID = NULL
+mydatawide$Depressed_Mood_Score_ID = NULL
+mydatawide$Other_Mental_Problems_Score_ID = NULL
+mydatawide$Relationship_Problems_Score_ID = NULL
+mydatawide$Daily_Living_Problems_Score_ID = NULL
+mydatawide$Living_Conditions_Problems_Score = NULL
+mydatawide$Occupational_Problems_Score_ID = NULL
+mydatawide$honos_Total = NULL
+mydatawide$Adjusted_Total = NULL
+mydatawide$years_on_antichol_post_index = NULL
+mydatawide$years_on_antipsych_post_index = NULL
+mydatawide$years_on_antidepressant_post_ind = NULL
+mydatawide$years_on_hypnotic_post_index = NULL
+mydatawide$BMI_score = NULL
+mydatawide$no_of_dental_diag = NULL
+mydatawide$no_of_op = NULL
+mydatawide$no_of_dental_opert = NULL
+mydatawide$EPIORDER = NULL
+mydatawide$duration_index_to_adm = NULL
+mydatawide$smi = NULL
+mydatawide$admission_no = NULL
+mydatawide$dental_event_no = NULL
+
+library(car)
+
+mydatawide$ethnicity_code <-
+recode(mydatawide$ethnicity_code, "0=6")
+mydatawide$borough = NULL
+mydatawide$ethnicity_1 <- 0 mydatawide$ethnicity_1[mydatawide$ethnicity_code == 1] = 1 mydatawide$ethnicity_2 <- 0 mydatawide$ethnicity_2[mydatawide$ethnicity_code == 2] = 1 mydatawide$ethnicity_3 <- 0 mydatawide$ethnicity_3[mydatawide$ethnicity_code == 3] = 1 mydatawide$ethnicity_4 <- 0 mydatawide$ethnicity_4[mydatawide$ethnicity_code == 4] = 1 mydatawide$ethnicity_5 <- 0 mydatawide$ethnicity_5[mydatawide$ethnicity_code == 5] = 1 mydatawide$ethnicity_6 <- 0 mydatawide$ethnicity_6[mydatawide$ethnicity_code == 6] = 1 mydatawide$ethnicity_code = NULL
+mydatawide$index_date = NULL
+mydatawide$cleaneddateofbirth = NULL
+mydatawide$age_group = NULL
+mydatawide$Gender_ID = NULL
+mydatawide$ethnicitycleaned = NULL mydatawide$ethnicity_group = NULL
+mydatawide$Date_Of_Death = NULL
+mydatawide$age_at_death = NULL
+mydatawide$LSOA11 = NULL
+mydatawide$address_detail = NULL
+mydatawide$z_borough_code <-
+rescale(mydatawide$borough_code, to = c(0, 1),
+    from = range(mydatawide$borough_code, na.rm = TRUE,
+finite = TRUE)  )
+mydatawide$borough_code = NULL
+mydatawide$z_inpatient_days_pre_index <- rescale(
+mydatawide$inpatient_days_pre_index_window, to = c(0, 1),
+from = range(
+mydatawide$inpatient_days_pre_index_window,   na.rm = TRUE,
+finite = TRUE ) )
+mydatawide$inpatient_days_pre_index_window = NULL
+mydatawide$z_inpatient_days_post_index <- rescale(
+mydatawide$inpatient_days_post_index, to = c(0, 1), from =
+range(      mydatawide$inpatient_days_post_index, na.rm =
+TRUE,  finite = TRUE   ) )
+mydatawide$inpatient_days_post_index = NULL
+mydatawide$N_f2f_team_inpatient_combined_6m = NULL
+mydatawide$N_f2f_team_inpatient_combined_to = NULL
+mydatawide$N_f2f_team_only_pre_index_window = NULL
+mydatawide$N_f2f_team_only_post_index_windo = NULL
+mydatawide$z_Agitated_Behaviour_Score_ID <- rescale(
+mydatawide$Agitated_Behaviour_Score_ID, to = c(0, 1), from =
+range(      mydatawide$Agitated_Behaviour_Score_ID,  na.rm =
+TRUE, finite = TRUE )  )
+mydatawide$Agitated_Behaviour_Score_ID = NULL
+mydatawide$Total = NULL
+mydatawide$dental_event_sum = NULL
+mydatawide$age_per_10_yr = NULL
+
+## ANN ##
+
+
+set.seed(222)
+library(neuralnet)
+nndatawide <- mydatawide
+
+# Split 75:35
+
+sample <- sample.int(n = nrow(nndatawide), size =
+floor(.75*nrow(nndatawide)), replace = F)
+trainsetwide <- nndatawide[sample, ]
+testsetwide  <- nndatawide[-sample, ]
+trainsetwide[is.na(trainsetwide)] <- 0
+
+nnwide <-  neuralnet( dental_event ~ gender_code +
+Depressive_RecurrentDepressive_F + smoking + diabetic +
+scaledage + z_Problem_Drinking_Drugs_Score_ID +
+z_Physical_Illness_Score_ID + z_BMI_score, data =
+trainsetwide, hidden = c(5, 3),   linear.output = FALSE,
+threshold = 0.01,err.fct = "sse", stepmax = 1000000  )
+
+# Prediction
+
+nnwide$result.matrix
+temp_test <- subset(testsetwide, select =
+c("gender_code","Depressive_RecurrentDepressive_F",
+"smoking", "diabetic", "scaledage",
+"z_Problem_Drinking_Drugs_Score_ID",
+"z_Physical_Illness_Score_ID", "z_BMI_score"))
+head(temp_test)
+nn.results <- compute(nnwide, temp_test)
+results <- data.frame(actual = testsetwide$dental_event,
+prediction = nn.results$net.result)
+results
+
+roundedresults<-sapply(results,round,digits=0)
+roundedresultsdf=data.frame(roundedresults)
+attach(roundedresultsdf)
+table(actual,prediction)
+
+
+## Logistic Regression ##
+
+library(caTools)
+set.seed(222)
+split = sample.split(mydatawide$dental_event, SplitRatio =
+0.75)
+LRmydatawideTrain = subset(mydatawide, split == TRUE)
+LRmydatawideTest = subset(mydatawide, split == FALSE)
+nrow(LRmydatawideTrain)
+nrow(LRmydatawideTest)
+mydataLog = glm(
+  dental_event ~ gender_code +
+Depressive_RecurrentDepressive_F + smoking + diabetic +
+scaledage,  data = LRmydatawideTrain,  family = binomial)
+library(ROCR)
+predictTrain = predict(mydataLog, type = "response", newdata
+= LRmydatawideTrain)
+table(LRmydatawideTrain$dental_event, predictTrain >= 0.3)
+predictTest = predict(mydataLog, type = "response", newdata =
+LRmydatawideTest)
+table(LRmydatawideTest$dental_event, predictTest >= 0.3)
+
+ROCRpred = prediction(predictTrain,
+LRmydatawideTrain$dental_event)
+
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+
+plot(ROCRperf)
+
+
+plot(ROCRperf, colorize = TRUE)
+
+plot(
+  ROCRperf,
+  colorize = TRUE,
+  print.cutoffs.at = seq(0, 1, by = 0.02),
+  text.adj = c(0.02, 1.7))
+
+library(pROC)
+
+auc(LRmydatawideTrain$dental_event, predictTrain)
